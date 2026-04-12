@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
  */
 
 @Entity(tableName = "credentials")
-data class Credentials(
+data class Credential(
 
     // Assign an unique ID automatically
     @PrimaryKey(autoGenerate = true)
