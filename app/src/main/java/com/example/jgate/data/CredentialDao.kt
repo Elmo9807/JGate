@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Data Access Object: Defines all database operations
- * Room is used to generate SQL implementation based on the annotations
+ * Room is used to generate SQL implementation based on the annotation
  */
 
 @Dao
