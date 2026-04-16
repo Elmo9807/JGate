@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Viewmodel for the credential list screen.
@@ -43,6 +44,15 @@ class VaultViewModel(private val repository: CredentialRepository) : ViewModel()
         viewModelScope.launch {
             repository.delete(credential)
         }
+    }
+
+    /**
+     * Gets a single credential by way of ID
+     * Returns a Flow such that detail screen updates reactively if the cred is edited elsewhere
+     */
+
+    fun getCredentialById(id: Int) : Flow<Credential?> {
+        return repository.getCredentialById(id)
     }
 
     /**
