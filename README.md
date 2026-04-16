@@ -95,7 +95,3 @@ The following features are not covered in the ED5042 lecture slides and are docu
 ## Build
 
 Built with Android Studio using AGP 9.0, Kotlin 2.0.21, and minimum SDK 24 (Android 7.0).
-
-## Author
-
-Dylan -- ED5042 Mobile App Development, University of Limerick
