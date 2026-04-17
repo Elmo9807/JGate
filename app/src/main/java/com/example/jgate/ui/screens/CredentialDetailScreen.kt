@@ -97,6 +97,48 @@ fun CredentialDetailScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
+        Text(
+            text = "Password",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = if (passwordVisible) credential.encryptedPassword else "••••••••",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Row {
+                // Toggle Password Vis
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) {
+                            Icons.Default.VisibilityOff
+                        } else {
+                            Icons.Default.Visibility
+                        },
+                        contentDescription = if (passwordVisible) "Hide Password" else "Show Password"
+                    )
+                }
+
+                // Copy password to clipboard
+
+                IconButton(onClick = {
+                    clipboardManager.setText(AnnotatedString(credential.encryptedPassword))
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = "Copy Password"
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
         // Category fields
 
         Text(
