@@ -11,4 +11,5 @@ import android.content.Context
 class AppContainer(context: Context) {
     private val database = VaultDatabase.getDatabase(context)
     val credentialRepository = CredentialRepository(database.credentialDao())
+    val masterPasswordManager = MasterPasswordManager(context)
 }
