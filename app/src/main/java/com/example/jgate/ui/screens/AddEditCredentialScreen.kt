@@ -23,6 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Reusable form composable shared by both Add & Edit screens.
@@ -59,7 +68,8 @@ fun CredentialForm(
             onValueChange = onSiteNameChange,
             label = { Text("Site name") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(autoCorrectEnabled = false)
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -68,7 +78,11 @@ fun CredentialForm(
             onValueChange = onUserNameChange,
             label = { Text("Username / Email") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                autoCorrectEnabled = false
+            )
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -78,6 +92,10 @@ fun CredentialForm(
             label = { Text("Password") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                autoCorrectEnabled = false
+            ),
             visualTransformation = if (passwordVisible) {
                 VisualTransformation.None
             } else {
@@ -103,7 +121,8 @@ fun CredentialForm(
             onValueChange = onCategoryChange,
             label = { Text("Category") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(autoCorrectEnabled = false)
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -129,6 +148,7 @@ fun CredentialForm(
  * Add Credential screen uses the shared CredentialForm.
  * Holds the form state and passes it down to the form.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCredentialScreen(
     onSave: (String, String, String, String, String) -> Unit,
@@ -141,32 +161,49 @@ fun AddCredentialScreen(
     var category by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
-    CredentialForm(
-        siteName = siteName,
-        userName = userName,
-        password = password,
-        category = category,
-        notes = notes,
-        onSiteNameChange = { siteName = it },
-        onUserNameChange = { userName = it },
-        onPasswordChange = { password = it },
-        onCategoryChange = { category = it },
-        onNotesChange = { notes = it },
-        onSaveClick = {
-            if (siteName.isNotBlank() && userName.isNotBlank() && password.isNotBlank()) {
-                onSave(siteName, userName, password, category, notes)
-                onNavigateBack()
-            }
-        },
-        buttonText = "Save",
-        modifier = modifier
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Add credential") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        CredentialForm(
+            siteName = siteName,
+            userName = userName,
+            password = password,
+            category = category,
+            notes = notes,
+            onSiteNameChange = { siteName = it },
+            onUserNameChange = { userName = it },
+            onPasswordChange = { password = it },
+            onCategoryChange = { category = it },
+            onNotesChange = { notes = it },
+            onSaveClick = {
+                if (siteName.isNotBlank() && userName.isNotBlank() && password.isNotBlank()) {
+                    onSave(siteName, userName, password, category, notes)
+                    onNavigateBack()
+                }
+            },
+            buttonText = "Save",
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 /**
  * Edit Credential screen uses the same shared CredentialForm.
  * Pre-fills the form with existing credential data.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditCredentialScreen(
     initialSiteName: String,
@@ -184,24 +221,40 @@ fun EditCredentialScreen(
     var category by remember { mutableStateOf(initialCategory) }
     var notes by remember { mutableStateOf(initialNotes) }
 
-    CredentialForm(
-        siteName = siteName,
-        userName = userName,
-        password = password,
-        category = category,
-        notes = notes,
-        onSiteNameChange = { siteName = it },
-        onUserNameChange = { userName = it },
-        onPasswordChange = { password = it },
-        onCategoryChange = { category = it },
-        onNotesChange = { notes = it },
-        onSaveClick = {
-            if (siteName.isNotBlank() && userName.isNotBlank() && password.isNotBlank()) {
-                onSave(siteName, userName, password, category, notes)
-                onNavigateBack()
-            }
-        },
-        buttonText = "Update",
-        modifier = modifier
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Edit credential") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        CredentialForm(
+            siteName = siteName,
+            userName = userName,
+            password = password,
+            category = category,
+            notes = notes,
+            onSiteNameChange = { siteName = it },
+            onUserNameChange = { userName = it },
+            onPasswordChange = { password = it },
+            onCategoryChange = { category = it },
+            onNotesChange = { notes = it },
+            onSaveClick = {
+                if (siteName.isNotBlank() && userName.isNotBlank() && password.isNotBlank()) {
+                    onSave(siteName, userName, password, category, notes)
+                    onNavigateBack()
+                }
+            },
+            buttonText = "Update",
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }

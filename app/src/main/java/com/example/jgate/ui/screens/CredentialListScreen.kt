@@ -26,6 +26,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.jgate.data.Credential
 import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Key
 
 /**
  * Main screen showing all saved credentials in a scrollable list.
@@ -36,14 +41,36 @@ import androidx.compose.ui.Alignment
  * @param onAddClick - called when the user taps the FAB (navigates to add screen)
  */
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CredentialListScreen(
     credentials: List<Credential>,
     onCredentialClick: (Credential) -> Unit,
     onAddClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onGeneratorClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Gates of Janus") },
+                actions = {
+                    IconButton(onClick = onGeneratorClick) {
+                        Icon(
+                            imageVector = Icons.Default.Key,
+                            contentDescription = "Password generator"
+                        )
+                    }
+                    IconButton(onClick = onLogoutClick) {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Logout"
+                        )
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClick) {
                 Icon(
