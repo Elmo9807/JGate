@@ -32,9 +32,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.jgate.data.Credential
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Scaffold
 
 /**
@@ -59,16 +57,10 @@ fun CredentialDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(credential.siteName) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+            JanusTopBar(
+                title = credential.siteName,
+                showBackButton = true,
+                onBackClick = onNavigateBack
             )
         }
     ) { innerPadding ->

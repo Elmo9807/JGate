@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * Single storeed credential in the Vault of Janus
+ * Single stored credential in the Vault of Janus
  */
 
 @Entity(tableName = "credentials")

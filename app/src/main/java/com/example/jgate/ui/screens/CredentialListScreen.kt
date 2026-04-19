@@ -28,9 +28,12 @@ import com.example.jgate.data.Credential
 import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.text.KeyboardOptions
 
 /**
  * Main screen showing all saved credentials in a scrollable list.
@@ -45,6 +48,8 @@ import androidx.compose.material.icons.filled.Key
 @Composable
 fun CredentialListScreen(
     credentials: List<Credential>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onCredentialClick: (Credential) -> Unit,
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -53,8 +58,8 @@ fun CredentialListScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Gates of Janus") },
+            JanusTopBar(
+                title = "Gates of Janus",
                 actions = {
                     IconButton(onClick = onGeneratorClick) {
                         Icon(
@@ -80,38 +85,70 @@ fun CredentialListScreen(
             }
         }
     ) { innerPadding ->
-        if (credentials.isEmpty()) {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Your vault is empty",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Tap + to add your first credential",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(credentials) { credential ->
-                    CredentialCard(
-                        credential = credential,
-                        onClick = { onCredentialClick(credential) }
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            // Search bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                label = { Text("Search Credentials") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search"
                     )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        IconButton(onClick = { onSearchQueryChange("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Clear search"
+                            )
+                        }
+                    }
+                },
+                keyboardOptions = KeyboardOptions(autoCorrectEnabled = false)
+            )
+
+            if (credentials.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (searchQuery.isBlank()) "Your vault is empty" else "No results found",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = if (searchQuery.isBlank()) "Tap + to add your first credential" else "Try a different search",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(credentials) { credential ->
+                        CredentialCard(
+                            credential = credential,
+                            onClick = { onCredentialClick(credential) }
+                        )
+                    }
                 }
             }
         }

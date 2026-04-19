@@ -1,6 +1,7 @@
 package com.example.jgate
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,11 +22,10 @@ import com.example.jgate.ui.screens.CredentialDetailScreen
 import com.example.jgate.ui.screens.CredentialListScreen
 import com.example.jgate.ui.screens.EditCredentialScreen
 import com.example.jgate.ui.screens.JanusScreen
-import com.example.jgate.ui.theme.JGateTheme
-import com.example.jgate.viewmodel.VaultViewModel
 import com.example.jgate.ui.screens.LoginScreen
 import com.example.jgate.ui.screens.PasswordGeneratorScreen
-import android.view.WindowManager
+import com.example.jgate.ui.theme.JGateTheme
+import com.example.jgate.viewmodel.VaultViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +50,7 @@ class MainActivity : ComponentActivity() {
                     )
 
                     val credentials by viewModel.allCredentials.collectAsState()
+                    val searchQuery by viewModel.searchQuery.collectAsState()
                     val navController = rememberNavController()
                     val masterPasswordManager = application.container.masterPasswordManager
 
@@ -84,6 +85,8 @@ class MainActivity : ComponentActivity() {
                         composable(route = JanusScreen.CredentialList.name) {
                             CredentialListScreen(
                                 credentials = credentials,
+                                searchQuery = searchQuery,
+                                onSearchQueryChange = { viewModel.updateSearchQuery(it) },
                                 onCredentialClick = { credential ->
                                     navController.navigate(
                                         JanusScreen.CredentialDetail.name + "/${credential.id}"
@@ -134,25 +137,25 @@ class MainActivity : ComponentActivity() {
                             ) { backStackEntry ->
                                 val credentialId = backStackEntry.arguments?.getInt("credentialId")
                                     ?: return@composable
-                                // Find the credential in the current list
 
-                                val credential = credentials.find { it.id == credentialId }
-                                if (credential != null) {
-                                    CredentialDetailScreen(
-                                        credential = credential,
-                                        onEditClick = {
-                                            navController.navigate(
-                                                JanusScreen.EditCredential.name + "/$credentialId"
-                                            )
-                                        },
-                                        onDeleteClick = {
-                                            viewModel.delete(credential)
-                                        },
-                                        onNavigateBack = {
-                                            navController.popBackStack()
-                                        }
-                                    )
-                                }
+                                val credentialState by viewModel.getCredentialById(credentialId)
+                                    .collectAsState(initial = null)
+                                val credential = credentialState ?: return@composable
+
+                                CredentialDetailScreen(
+                                    credential = credential,
+                                    onEditClick = {
+                                        navController.navigate(
+                                            JanusScreen.EditCredential.name + "/$credentialId"
+                                        )
+                                    },
+                                    onDeleteClick = {
+                                        viewModel.delete(credential)
+                                    },
+                                    onNavigateBack = {
+                                        navController.popBackStack()
+                                    }
+                                )
                             }
 
                             // Edit credential screen - takes a credential ID as navigation argument
@@ -165,37 +168,36 @@ class MainActivity : ComponentActivity() {
                             ) { backStackEntry ->
                                 val credentialId = backStackEntry.arguments?.getInt("credentialId")
                                     ?: return@composable
-                                val credential = credentials.find { it.id == credentialId }
-                                if (credential != null) {
-                                    EditCredentialScreen(
-                                        initialSiteName = credential.siteName,
-                                        initialUserName = credential.userName,
-                                        initialPassword = credential.encryptedPassword,
-                                        initialCategory = credential.category,
-                                        initialNotes = credential.notes,
-                                        onSave = { siteName, userName, password, category, notes ->
-                                            viewModel.update(
-                                                credential.copy(
-                                                    siteName = siteName,
-                                                    userName = userName,
-                                                    encryptedPassword = password,
-                                                    category = category,
-                                                    notes = notes,
-                                                    dateModified = System.currentTimeMillis()
-                                                )
-                                            )
-                                        },
-                                        onNavigateBack = {
-                                            // Pop back twice to return to the list, not the detail screen
-                                            // (since the credential data it was showing is now stale)
 
-                                            navController.popBackStack(
-                                                route = JanusScreen.CredentialList.name,
-                                                inclusive = false
+                                val credentialState by viewModel.getCredentialById(credentialId)
+                                    .collectAsState(initial = null)
+                                val credential = credentialState ?: return@composable
+
+                                EditCredentialScreen(
+                                    initialSiteName = credential.siteName,
+                                    initialUserName = credential.userName,
+                                    initialPassword = credential.encryptedPassword,
+                                    initialCategory = credential.category,
+                                    initialNotes = credential.notes,
+                                    onSave = { siteName, userName, password, category, notes ->
+                                        viewModel.update(
+                                            credential.copy(
+                                                siteName = siteName,
+                                                userName = userName,
+                                                encryptedPassword = password,
+                                                category = category,
+                                                notes = notes,
+                                                dateModified = System.currentTimeMillis()
                                             )
-                                        }
-                                    )
-                                }
+                                        )
+                                    },
+                                    onNavigateBack = {
+                                        navController.popBackStack(
+                                            route = JanusScreen.CredentialList.name,
+                                            inclusive = false
+                                        )
+                                    }
+                                )
                             }
 
                         // Password generator screen
