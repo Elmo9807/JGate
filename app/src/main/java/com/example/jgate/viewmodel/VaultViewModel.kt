@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 
 /**
  * Viewmodel for the credential list screen.
@@ -19,13 +21,30 @@ import kotlinx.coroutines.flow.Flow
 
 class VaultViewModel(private val repository: CredentialRepository) : ViewModel() {
 
-    // Collects the Flow from the REPO and converts it to a StateFlow, such that Compose may observe it using collectAsState()
+    // Search query state
+    val searchQuery = MutableStateFlow("")
+
+    // Credentials filtered by search query
     val allCredentials: StateFlow<List<Credential>> =
-        repository.allCredentials.stateIn(
+        combine(repository.allCredentials, searchQuery) { credentials, query ->
+            if (query.isBlank()) {
+                credentials
+            } else {
+                credentials.filter { credential ->
+                    credential.siteName.contains(query, ignoreCase = true) ||
+                            credential.userName.contains(query, ignoreCase = true) ||
+                            credential.category.contains(query, ignoreCase = true)
+                }
+            }
+        }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    fun updateSearchQuery(query: String) {
+        searchQuery.value = query
+    }
 
     // Each op starts a coroutine so it runs on a background thread
     fun insert(credential: Credential) {

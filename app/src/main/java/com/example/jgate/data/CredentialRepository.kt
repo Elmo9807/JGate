@@ -31,13 +31,6 @@ class CredentialRepository(
             credential?.copy(encryptedPassword = cryptoManager.decrypt(credential.encryptedPassword))
         }
 
-    fun searchCredentials(query: String): Flow<List<Credential>> =
-        credentialDao.searchCredentials(query).map { list ->
-            list.map { credential ->
-                credential.copy(encryptedPassword = cryptoManager.decrypt(credential.encryptedPassword))
-            }
-        }
-
     /**
      * Encrypts the password before saving to the database.
      */

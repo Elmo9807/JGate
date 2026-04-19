@@ -22,9 +22,6 @@ interface CredentialDao {
     @Query("SELECT * FROM credentials WHERE id = :id")
     fun getCredentialById(id: Int): Flow<Credential?>
 
-    @Query("SELECT * FROM credentials WHERE siteName LIKE '%' || :query || '%' ORDER BY dateModified DESC")
-    fun searchCredentials(query: String): Flow<List<Credential>>
-
     // suspend runs on background thread through coroutine
     @Insert
     suspend fun insert(credential: Credential)
